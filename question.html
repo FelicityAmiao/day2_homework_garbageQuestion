@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8" />
+    <link href="../resources/css/ext-all.css" rel="stylesheet" type="text/css" />
+    <script src="../adapter/ext/ext-base.js" type="text/javascript"></script>
+    <script src="../ext-all.js" type="text/javascript"></script>
+    <script>
+        Ext.onReady(function() {
+            var AnswerRecord = new Ext.data.Record.create([{
+                name: 'garbageTypeAnswer',
+                type: 'string'
+            }, {
+                name: 'babaGarbageAnswer',
+                type: 'string'
+            }]);
+            var changeQuestion = function(direction) {
+                var card = Ext.getCmp('card').getLayout();
+                var activeId = parseInt(card.activeItem.id.split('-')[1]) + direction;
+                card.setActiveItem(activeId);
+                Ext.getCmp('lastQ').setDisabled(false);
+                Ext.getCmp('nextQ').setDisabled(false);
+                if (activeId === 0) Ext.getCmp('lastQ').setDisabled(true);
+                if (activeId === 2) {
+                    Ext.getCmp('nextQ').setDisabled(true);
+                    var selectedBoxLabel = question1.form.items.items.filter(item => Ext.getCmp(item.id).getValue())[0];
+                    var answerData = {
+                        garbageTypeAnswer: selectedBoxLabel ? selectedBoxLabel.boxLabel : '',
+                        babaGarbageAnswer: question2.form.items.items.filter(item => Ext.getCmp(item.id).getValue()).map(item => item.boxLabel) || ''
+                    };
+                    question3.form.loadRecord(new AnswerRecord(answerData));
+                }
+            }
+            var question1 = new Ext.form.FormPanel({
+                id: 'question-0',
+                items: [{
+                    id: 'abc',
+                    xtype: 'fieldset',
+                    defaultType: 'radio',
+                    title: 'Q1:番茄酱属于以下哪种垃圾？(单选)',
+                    items: [{
+                        id: 'selection-1',
+                        boxLabel: '湿垃圾',
+                        name: 'garbageType'
+                    }, {
+                        id: 'selection-2',
+                        boxLabel: '干垃圾',
+                        name: 'garbageType'
+                    }, {
+                        id: 'selection-3',
+                        boxLabel: '有害垃圾',
+                        name: 'garbageType'
+                    }, {
+                        id: 'selection-4',
+                        boxLabel: '可回收物',
+                        name: 'garbageType'
+                    }]
+                }]
+            })
+            var question2 = new Ext.form.FormPanel({
+                id: 'question-1',
+                items: [{
+                    xtype: 'fieldset',
+                    defaultType: 'checkbox',
+                    title: 'Q50:王大叔出门遛狗后，哪些是正确处理狗粑粑的方法？(多选)',
+                    items: [{
+                        id: 'checkbox-1',
+                        boxLabel: '把粑粑用旧报纸包好带回家冲掉',
+                        name: 'babaGarbage'
+                    }, {
+                        id: 'checkbox-2',
+                        boxLabel: '受污染的报纸按有害垃圾处理',
+                        name: 'babaGarbage'
+                    }, {
+                        id: 'checkbox-3',
+                        boxLabel: '没受污染的报纸按可回收垃圾处理',
+                        name: 'babaGarbage'
+                    }, {
+                        id: 'checkbox-4',
+                        boxLabel: '受污染的报纸浸水后当湿垃圾处理',
+                        name: 'babaGarbage'
+                    }]
+                }]
+            });
+
+            Ext.QuickTips.init();
+            Ext.form.Field.prototype.msgTarget = 'side';
+            var question3 = new Ext.form.FormPanel({
+                id: 'question-2',
+                items: [{
+                    xtype: 'fieldset',
+                    title: '你的答案：',
+                    items: [{
+                        id: 'garbageTypeAnswer',
+                        xtype: 'textfield',
+                        width: 600,
+                        allowBlank: false,
+                        blankText: '请返回答题！',
+                        fieldLabel: 'Q1:番茄酱属于以下哪种垃圾？(单选)',
+                        emptyText: '请返回答题',
+                    }, {
+                        id: 'babaGarbageAnswer',
+                        xtype: 'textfield',
+                        width: 600,
+                        allowBlank: false,
+                        blankText: '请返回答题！',
+                        fieldLabel: 'Q50:王大叔出门遛狗后，哪些是正确处理狗粑粑的方法？(多选)',
+                        emptyText: '请返回答题',
+                    }, {
+                        xtype: 'button',
+                        text: '提交答案',
+                        listeners: {
+                            'click': function() {
+                                if (question3.form.isValid()) {
+                                    let str = '';
+                                    question3.form.items.items.forEach((item) => {
+                                        str += `${item.fieldLabel}: ${item.getValue()}<br/>`
+                                    });
+                                    Ext.MessageBox.alert('提交答案', str, function(btn, text) {
+                                        if (btn === 'ok') {
+                                            Ext.MessageBox.alert('提示', 'Congratulation!');
+                                        }
+                                    });
+                                } else {
+                                    Ext.MessageBox.alert('答题提醒', '请答完全部题目！');
+                                }
+                            }
+                        }
+                    }]
+                }]
+            });
+            var card = new Ext.Panel({
+                title: '环保垃圾选择题',
+                id: 'card',
+                layout: 'card',
+                height: 500,
+                activeItem: 0,
+                bbar: [{
+                    id: 'lastQ',
+                    text: '上一题',
+                    handler: changeQuestion.createDelegate(this, [-1]),
+                    disabled: true
+                }, {
+                    id: 'nextQ',
+                    text: '下一题',
+                    handler: changeQuestion.createDelegate(this, [1])
+                }],
+                items: [question1, question2, question3]
+            });
+            new Ext.Viewport({
+                items: [card]
+            })
+        })
+    </script>
+</head>
+
+<body>
+</body>
+
+</html>
