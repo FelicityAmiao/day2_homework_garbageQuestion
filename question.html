@@ -29,7 +29,7 @@
                         garbageTypeAnswer: selectedBoxLabel ? selectedBoxLabel.boxLabel : '',
                         babaGarbageAnswer: question2.form.items.items.filter(item => Ext.getCmp(item.id).getValue()).map(item => item.boxLabel) || ''
                     };
-                    question3.form.loadRecord(new AnswerRecord(answerData));
+                    confirmCard.form.loadRecord(new AnswerRecord(answerData));
                 }
             }
             var question1 = new Ext.form.FormPanel({
@@ -86,7 +86,7 @@
 
             Ext.QuickTips.init();
             Ext.form.Field.prototype.msgTarget = 'side';
-            var question3 = new Ext.form.FormPanel({
+            var confirmCard = new Ext.form.FormPanel({
                 id: 'question-2',
                 items: [{
                     xtype: 'fieldset',
@@ -112,9 +112,9 @@
                         text: '提交答案',
                         listeners: {
                             'click': function() {
-                                if (question3.form.isValid()) {
+                                if (confirmCard.form.isValid()) {
                                     let str = '';
-                                    question3.form.items.items.forEach((item) => {
+                                    confirmCard.form.items.items.forEach((item) => {
                                         str += `${item.fieldLabel}: ${item.getValue()}<br/>`
                                     });
                                     Ext.MessageBox.alert('提交答案', str, function(btn, text) {
@@ -146,7 +146,7 @@
                     text: '下一题',
                     handler: changeQuestion.createDelegate(this, [1])
                 }],
-                items: [question1, question2, question3]
+                items: [question1, question2, confirmCard]
             });
             new Ext.Viewport({
                 items: [card]
